@@ -9,6 +9,9 @@
 #include <unistd.h>
 #include <iostream>
 #include <cstring>
+#include <openssl/rsa.h>
+
+
 
 
 int main()
@@ -31,7 +34,6 @@ int main()
         std::cout << "Socket Failed\n";
         exit(EXIT_FAILURE);
     }
-
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
     address.sin_port = htons(8080);
