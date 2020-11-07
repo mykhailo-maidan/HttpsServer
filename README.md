@@ -1,4 +1,3 @@
-
-[![CMake Actions Status](https://github.com/MYMAIDAN/HttpsServer/workflows/CMake/badge.svg)](https://github.com/MYMAIDAN/HttpsServer/actions)
+[![Build Status](https://travis-ci.com/MYMAIDAN/HttpsServer.svg?branch=main)](https://travis-ci.com/MYMAIDAN/HttpsServer)
 
 # HttpsServer
