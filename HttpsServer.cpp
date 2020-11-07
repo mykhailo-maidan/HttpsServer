@@ -63,3 +63,8 @@ SSL_CTX* HttpServer::initServerCtx()
     return ctx;
 
 }
+
+void HttpsServer::loadCertificates(SLL_CTX* ctx, char* certFile, char* keyFile)
+{
+
+}
