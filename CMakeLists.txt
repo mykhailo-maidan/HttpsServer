@@ -8,6 +8,10 @@ conan_basic_setup()
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_executable(HttpsServer main.cpp)
+add_executable(HttpsServer main.cpp HttpsServer.cpp)
+
+add_executable(HttpsClient clientExample/main.cpp)
 
 target_link_libraries(HttpsServer ${CONAN_LIBS})
+
+target_link_libraries(HttpsClient ${CONAN_LIBS})
