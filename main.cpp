@@ -10,16 +10,19 @@
 #include <iostream>
 #include <cstring>
 #include <openssl/rsa.h>
-#include "HttpsServer.h"
+#include "TLSServerSocket.h"
 
 
 
 int main()
 {
-    HttpsServer server;
+    TLSServerSocket server;
     server.start(8080);
+
+    auto client  = server.nextConnection();
+
+    std::cout << client.read() << std::endl;
+
+    client.write("Hello from new tls socket");
     return 0;
-
-
-
 }

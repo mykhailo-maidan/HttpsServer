@@ -1,49 +1,48 @@
-#include "HttpsServer.h"
+#include "TLSServerSocket.h"
+#include "TLSSocket.h"
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netinet/in.h>
+#include <memory>
 
 
 
-HttpsServer::HttpsServer()
+TLSServerSocket::TLSServerSocket()
 {
 
 }
 
-HttpsServer::~HttpsServer()
+TLSServerSocket::~TLSServerSocket()
 {
 
 }
 
-void HttpsServer::start(uint64_t portNumber)
+void TLSServerSocket::start(uint64_t portNumber)
 {
+
     SSL_library_init();
-
     context = initServerCtx();
 
-    loadCertificates(context, "mycert.pem","mycert.pem");
+    loadCertificates(context.get(), "mycert.pem","mycert.pem");
 
     serverFd = createSocket(portNumber);
-
-    while(true)
-    {
-        struct sockaddr_in addr;
-        socklen_t len = sizeof(addr);
-
-        SSL* ssl;
-
-        int client = accept(serverFd, reinterpret_cast<struct sockaddr*>(&addr),&len);
-        printf("Connection:%s:%d\n", inet_ntoa(addr.sin_addr), htons(addr.sin_port));
-        ssl = SSL_new(context);
-        SSL_set_fd(ssl,client);
-        clientHandler(ssl);
-    }
-    //close(serverFd);
-    SSL_CTX_free(context);
 }
 
-int32_t HttpsServer::createSocket(uint32_t port)
+TLSSocket TLSServerSocket::nextConnection()
+{
+    struct sockaddr_in addr;
+    socklen_t len = sizeof(addr);
+
+    std::shared_ptr<SSL> sslSocket{nullptr};
+
+    auto client = accept(serverFd, reinterpret_cast<struct sockaddr*>(&addr),&len);
+
+    return TLSSocket(client, context);
+}
+
+
+int32_t TLSServerSocket::createSocket(uint32_t port)
 {
     int32_t serverFd{-1};
     struct sockaddr_in addr;
@@ -69,15 +68,15 @@ int32_t HttpsServer::createSocket(uint32_t port)
 }
 
 
-SSL_CTX* HttpsServer::initServerCtx()
+std::shared_ptr<SSL_CTX> TLSServerSocket::initServerCtx()
 {
     const SSL_METHOD* method{nullptr};
-    SSL_CTX* ctx{nullptr};
+    std::shared_ptr<SSL_CTX> ctx{nullptr};
     OpenSSL_add_all_algorithms();
     SSL_load_error_strings();
 
     method = TLSv1_2_server_method();
-    ctx = SSL_CTX_new(method);
+    ctx = std::shared_ptr<SSL_CTX>(SSL_CTX_new(method));
 
     if( ctx == nullptr )
     {
@@ -85,13 +84,13 @@ SSL_CTX* HttpsServer::initServerCtx()
         return nullptr;
     }
 
-    SSL_CTX_set_cipher_list(ctx,"ALL:eNULL");
+    SSL_CTX_set_cipher_list(ctx.get(),"ALL:eNULL");
 
     return ctx;
 
 }
 
-void HttpsServer::loadCertificates(SSL_CTX* ctx, char* certFile, char* keyFile)
+void TLSServerSocket::loadCertificates(SSL_CTX* ctx, char* certFile, char* keyFile)
 {
     if(SSL_CTX_use_certificate_file(ctx,certFile,SSL_FILETYPE_PEM) <= 0)
     {
@@ -112,30 +111,9 @@ void HttpsServer::loadCertificates(SSL_CTX* ctx, char* certFile, char* keyFile)
     }
 }
 
-void HttpsServer::showCerts(SSL* ssl)
-{
-    X509* cert;
-    char* line;
 
-    cert = SSL_get_peer_certificate(ssl);
-    if(cert != NULL)
-    {
-        printf("Server certificates:\n");
-        line = X509_NAME_oneline(X509_get_subject_name(cert),0,0);
-        printf("Subject: %s\n", line);
-        free(line);
-        line = X509_NAME_oneline(X509_get_subject_name(cert),0,0);
-        printf("Issuer: %s\n", line);
-        free(line);
-        X509_free(cert);
-    }
-    else
-    {
-        printf("No certificates.\n");
-    }
-}
 
-void HttpsServer::clientHandler(SSL* ssl)
+void TLSServerSocket::clientHandler(SSL* ssl)
 {
     char buff[1024] = {0};
     int bytes { 0 };
@@ -148,7 +126,6 @@ void HttpsServer::clientHandler(SSL* ssl)
 
     }
     {
-        showCerts(ssl);
         bytes = SSL_read(ssl, buff, sizeof(buff));
         buff[bytes] = '\0';
 

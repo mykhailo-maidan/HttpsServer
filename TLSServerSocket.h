@@ -1,32 +1,35 @@
-#ifndef _HTTPS_SERVER_H_
-#define _HTTPS_SERVER_H_
+#ifndef _TLS_SERVER_SOCKET_H_
+#define _TLS_SERVER_SOCKET_H_
 
+#include "TLSSocket.h"
 #include "openssl/ssl.h"
 #include "openssl/err.h"
-
 #include <string>
+#include <memory>
 
-class HttpsServer 
+
+class TLSServerSocket 
 {
 public:
-    explicit HttpsServer();
-    ~HttpsServer();
+
+    explicit TLSServerSocket();
+    ~TLSServerSocket();
 
     void start(uint64_t portNumber);
+
+    TLSSocket nextConnection();
 
 private:
     int32_t createSocket(uint32_t port);
 
-    SSL_CTX* initServerCtx();
+    std::shared_ptr<SSL_CTX> initServerCtx();
 
     void loadCertificates(SSL_CTX* ctx, char* certFile, char* keyFile);
-
-    void showCerts(SSL* ssl);
 
     void clientHandler(SSL* ssl);
 
 private:
-    SSL_CTX* context{nullptr};
+    std::shared_ptr<SSL_CTX> context{nullptr};
     uint64_t serverFd{0};
 
     
