@@ -15,7 +15,7 @@ namespace
         {
             SSL_CTX_free(p);
         }
-    }
+    };
 }
 
 TLSServerSocket::TLSServerSocket()
