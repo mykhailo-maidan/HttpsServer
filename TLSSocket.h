@@ -18,10 +18,18 @@ private:
 void showCerts();
 
 private:
-    std::shared_ptr<SSL_CTX> mContext{nullptr};
-    std::shared_ptr<SSL>     mSocketDescriptor{nullptr};
 
-
+class SSLDeleter
+{
+    public:
+    void operator()(SSL* p)
+    {
+        SSL_shutdown(p);
+        SSL_free(p);
+    }
+};
+    std::shared_ptr<SSL_CTX>          mContext{nullptr};
+    std::unique_ptr<SSL,SSLDeleter>   mSocketDescriptor{nullptr};
 };
 
 #endif // _TLS_SOCKET_H_

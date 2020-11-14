@@ -6,7 +6,17 @@
 #include <netinet/in.h>
 #include <memory>
 
-
+namespace 
+{
+    class SSLCTXDeleter
+    {
+    public:
+        void operator()(SSL_CTX* p)
+        {
+            SSL_CTX_free(p);
+        }
+    }
+}
 
 TLSServerSocket::TLSServerSocket()
 {
@@ -33,8 +43,6 @@ TLSSocket TLSServerSocket::nextConnection()
 {
     struct sockaddr_in addr;
     socklen_t len = sizeof(addr);
-
-    std::shared_ptr<SSL> sslSocket{nullptr};
 
     auto client = accept(serverFd, reinterpret_cast<struct sockaddr*>(&addr),&len);
 
@@ -76,7 +84,7 @@ std::shared_ptr<SSL_CTX> TLSServerSocket::initServerCtx()
     SSL_load_error_strings();
 
     method = TLSv1_2_server_method();
-    ctx = std::shared_ptr<SSL_CTX>(SSL_CTX_new(method));
+    ctx = std::shared_ptr<SSL_CTX>(SSL_CTX_new(method),SSLCTXDeleter());
 
     if( ctx == nullptr )
     {

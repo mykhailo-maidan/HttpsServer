@@ -1,6 +1,7 @@
 #include "TLSSocket.h"
 #include <iostream>
 
+
 TLSSocket::TLSSocket(int32_t fd, std::shared_ptr<SSL_CTX> context):
     mContext(context),
     mSocketDescriptor(SSL_new(mContext.get()))
