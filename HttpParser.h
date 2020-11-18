@@ -1,7 +1,6 @@
 #ifndef _HTTP_PARSER_H_
 #define _HTTP_PARSER_H_
 
-#include <string_view>
 #include <string>
 
 class HttpParser
@@ -25,14 +24,14 @@ public:
     };
 
 public:
-    explicit HttpParser(std::string_view data);
+    explicit HttpParser(const std::string& data);
     ~HttpParser();
 
     void parse();
     
 
 private:
-    std::string_view mDataForParsing;
+    std::string mDataForParsing;
 };
 
 #endif // _HTTP_PARSER_H_

@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <iterator>
 
-HttpParser::HttpParser(std::string_view data) : 
+HttpParser::HttpParser(const std::string& data) : 
     mDataForParsing(data)
 {
 
