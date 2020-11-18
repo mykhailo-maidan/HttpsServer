@@ -15,10 +15,9 @@ public:
 
     void write(const std::string& message);
 private:
-void showCerts();
+    void showCerts();
 
 private:
-
 class SSLDeleter
 {
     public:
