@@ -32,6 +32,8 @@ public:
 
 private:
     std::string mDataForParsing;
+private:
+    void parseMethod(const std::string& token, SHeader& header);
 };
 
 #endif // _HTTP_PARSER_H_
