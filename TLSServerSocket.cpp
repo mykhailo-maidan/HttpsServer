@@ -34,7 +34,7 @@ void TLSServerSocket::start(uint64_t portNumber)
     SSL_library_init();
     context = initServerCtx();
 
-    loadCertificates(context.get(), "mycert.pem","mycert.pem");
+    loadCertificates(context.get(), "server-certificate.pem","server-private-key.pem");
 
     serverFd = createSocket(portNumber);
 }

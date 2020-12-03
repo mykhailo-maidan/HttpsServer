@@ -8,7 +8,7 @@ conan_basic_setup()
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_executable(HttpsServer main.cpp TLSServerSocket.cpp TLSSocket.cpp HttpParser.cpp)
+add_executable(HttpsServer main.cpp ServerSocket.cpp Socket.cpp)
 
 add_executable(HttpsClient clientExample/main.cpp)
 
